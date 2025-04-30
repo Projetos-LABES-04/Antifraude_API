@@ -24,3 +24,4 @@ async def listar_transacoes():
         return transacoes_serializadas
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
+    

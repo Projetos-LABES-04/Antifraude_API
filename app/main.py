@@ -5,3 +5,9 @@ app = FastAPI()
 
 # Registrar as rotas
 app.include_router(transacao_router, prefix="/api/v1/transacoes", tags=["Transações"])
+
+
+# Rota para indicar que a API iniciou
+@app.get("/")
+async def root():
+    return {"mensagem": "API Antifraude iniciada com sucesso!"}
