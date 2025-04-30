@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.transacao import router as transacao_router
+from app.routes.transacao import router as transacao_router
 
 app = FastAPI()
 
