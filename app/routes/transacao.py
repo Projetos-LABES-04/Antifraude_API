@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.db.database import db
 from bson import ObjectId  # Para lidar com ObjectId
-from app.schemas.transacao_schema import Transacao  # Importação correta
 
 router = APIRouter()
 
