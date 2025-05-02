@@ -12,3 +12,4 @@ app.include_router(transacao_router, tags=["Transações"])
 @app.get("/")
 async def root():
     return {"mensagem": "API Antifraude iniciada com sucesso!"}
+
