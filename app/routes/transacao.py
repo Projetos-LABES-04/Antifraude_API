@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.db.database import db
 from bson import ObjectId  # Para lidar com ObjectId
-from app.schemas.transacao_schema import Transacao
+from app.schemas.transacao_schema import Transacao  # Importação correta
 
 router = APIRouter()
 
@@ -26,9 +26,3 @@ async def listar_transacoes():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
     
-@router.post("/transacoes/teste")
-async def testar_transacao(transacao: Transacao):
-    return {
-        "mensagem": "Transação validada com sucesso!",
-        "dados": transacao
-    }
