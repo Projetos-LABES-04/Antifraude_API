@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,status
 from app.db.database import db
 from bson import ObjectId  # Para lidar com ObjectId
 from app.schemas.transacao_schema import Transacao
@@ -26,14 +26,3 @@ async def listar_transacoes():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
     
-
-@router.post("/nova_transacao/")
-async def criar_transacao(transacao: Transacao):
-    try:
-        # Os dados em 'transacao' já foram validados pelo Pydantic
-        transacao_dict = transacao.dict()
-        result = await db["todo_collection"].insert_one(transacao_dict)
-        nova_transacao = await db["todo_collection"].find_one({"_id": result.inserted_id})
-        return serialize_document(nova_transacao)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao inserir a transação: {str(e)}")
