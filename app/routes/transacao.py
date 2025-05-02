@@ -35,11 +35,6 @@ async def listar_transacoes():
     summary="Cria uma nova transação (só para testar validações)"
 )
 async def criar_transacao(transacao: Transacao):
-    """
-    Recebe o body conforme o schema Transacao,
-    valida automaticamente campos obrigatórios, formatos e ranges.
-    Se tudo estiver OK, retorna o objeto validado.
-    """
     try:
         # Aqui você poderia inserir no banco:
         # result = await db["todo_collection"].insert_one(transacao.dict(exclude={"_id"}))
