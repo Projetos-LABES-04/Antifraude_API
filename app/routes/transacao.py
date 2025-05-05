@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException,status
 from app.db.database import db
 from bson import ObjectId  # Para lidar com ObjectId
-from app.schemas.transacao_schema import Transacao
-from fastapi.responses import JSONResponse
+
 
 router = APIRouter()
 
