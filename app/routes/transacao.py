@@ -26,29 +26,3 @@ async def listar_transacoes():
         return transacoes_serializadas
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
-
-
-@router.post(
-    "/transacoes",
-    response_model=Transacao,
-    status_code=status.HTTP_201_CREATED,
-    summary="Cria uma nova transação (só para testar validações)"
-)
-async def criar_transacao(transacao: Transacao):
-    try:
-        # Aqui você poderia inserir no banco:
-        # result = await db["todo_collection"].insert_one(transacao.dict(exclude={"_id"}))
-        # transacao._id = str(result.inserted_id)
-
-        # Para fins de teste, só devolvemos o próprio objeto:
-        return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
-            content=transacao.dict()
-        )
-    except Exception as e:
-        # Se algo der errado dentro da validação (raro, pois Pydantic já validou),
-        # ou numa lógica extra, retornamos erro 400
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
