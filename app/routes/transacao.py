@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException,status
 from app.db.database import db
 from bson import ObjectId  # Para lidar com ObjectId
-
+from app.schemas.transacao_schema import TransacaoBase
 
 router = APIRouter()
 
@@ -40,3 +40,8 @@ async def debug_conexao():
     return {
         "mensagem": "Verifique o terminal/log do servidor para ver os prints."
     }
+
+@router.post("/avaliar")
+async def avaliar_transacao(transacao: TransacaoBase):
+    # Aqui, os dados JÁ estão validados
+    return {"dados": transacao}
