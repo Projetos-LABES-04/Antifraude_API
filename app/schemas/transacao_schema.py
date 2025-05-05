@@ -15,17 +15,6 @@ class Transacao(BaseModel):
     transacao_valor: float = Field(..., gt=0, le=1000000, description="O valor deve estar entre 0 e 1.000.000")
     transacao_tipo: Literal["pix", "boleto", "cartao", "transferencia"]
     
-    @validator('conta_id', 'conta_destino_id')
-    def validate_account_format(cls, v):
-        if not re.match(r'^[A-Za-z0-9-]+$', v):
-            raise ValueError("Formato de conta inválido. Use apenas letras, números e hífens")
-        return v
-    
-    @validator('transacao_id')
-    def validate_transaction_id(cls, v):
-        if not v.startswith('tx_'):
-            raise ValueError("ID de transação deve começar com 'tx_'")
-        return v
     
     class Config:
         json_encoders = {
