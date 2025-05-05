@@ -43,8 +43,6 @@ def validar_senha(cls, v):
 
 
 
-
-
 @router.post('/login')
 def login_usuario(data: LoginModel):
     try:
