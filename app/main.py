@@ -3,8 +3,6 @@ from app.routes.usuario import router as usuario_router
 from app.routes.transacao import router as transacao_router
 
 
-
-
 app = FastAPI()
 
 # Registrar as rotas
