@@ -3,10 +3,10 @@ from app.schemas.conta_schema import Conta
 
 # Simulando dados
 contas_db = [
-    Conta(id=1, nome="Conta 1", status="em análise"),
-    Conta(id=2, nome="Conta 2", status="segura"),
-    Conta(id=3, nome="Conta 3", status="em análise"),
-    Conta(id=4, nome="Conta 4", status="segura"),
+    Conta(id=1, nome="transação 1", status="fraudulenta"),
+    Conta(id=2, nome="transação 2", status="não fraudulenta"),
+    Conta(id=3, nome="transação 3", status=""),
+    Conta(id=4, nome="transação 4", status="segura"),
 ]
 
 def listar_contas(status: Optional[str] = None) -> List[Conta]:
