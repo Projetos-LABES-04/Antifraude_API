@@ -26,20 +26,6 @@ async def listar_transacoes():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
 
-@router.get("/debug")
-async def debug_transacoes():
-    count = await db["todo_collection"].count_documents({})
-    return {"total_transacoes": count}
-
-
-@router.get("/debug/conexao")
-async def debug_conexao():
-    print("Conectado ao banco:", db.name)
-    colecoes = await db.list_collection_names()
-    print("Coleções disponíveis:", colecoes)
-    return {
-        "mensagem": "Verifique o terminal/log do servidor para ver os prints."
-    }
 
 @router.post("/avaliar")
 async def avaliar_transacao(transacao: TransacaoBase):
