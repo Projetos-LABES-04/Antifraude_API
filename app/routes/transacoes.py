@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from database.mongodb import collection
+from db.database import collection
 from services.ml_client import chamar_servico_ml
 
 
