@@ -14,6 +14,8 @@ async def processar_transacoes_sem_status():
             resultado = await chamar_servico_ml(transacao)
             status = "suspeito" if resultado == 1 else "normal"
 
+
+            #atualiza o banco adicionando o status
             await collection.update_one(
                 {"_id": transacao["_id"]},
                 {"$set": {
