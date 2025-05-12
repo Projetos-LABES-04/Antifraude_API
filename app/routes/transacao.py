@@ -5,6 +5,8 @@ from app.schemas.transacao_schema import TransacaoBase
 from app.services.ml_client import chamar_servico_ml 
 from time import sleep
 import asyncio  # para pausa entre transações
+from fastapi.responses import JSONResponse
+
 
 router = APIRouter()
 
@@ -36,26 +38,28 @@ async def avaliar_transacao(transacao: TransacaoBase):
     return {"dados": transacao}
 
 
+# Rota para processar transações pendentes em lotes
 @router.post("/transacoes/processar_pendentes")
 async def processar_em_lotes(
-    lote: int = Query(1000, ge=1, le=10000),
-    pausa: int = Query(2, ge=0, description="Pausa entre os lotes em segundos"),
-    entre_transacoes: float = Query(0.0, ge=0.0, le=2.0, description="Pausa entre transações em segundos")
+    lote: int = Query(1000, ge=100, le=2000),
+    pausa: int = Query(2, ge=0, le=10, description="Pausa entre os lotes (segundos)"),
+    entre_transacoes: float = Query(0.05, ge=0.0, le=1.0, description="Pausa entre cada requisição ao ML (segundos)")
 ):
     """
-    Processa transações pendentes em lotes (ciclos) de N registros.
-    Permite configurar pausa entre os ciclos e entre cada transação.
+    Processa transações pendentes em lotes controlados.
+    Envia para o modelo de ML hospedado e atualiza o banco com o resultado.
     """
     total_processadas = 0
+    suspeitas = 0
+    normais = 0
     lote_atual = 1
 
     while True:
         pendentes = await db["todo_collection"].find({"status": {"$exists": False}}).to_list(length=lote)
-
         if not pendentes:
             break
 
-        print(f"🔄 Processando lote {lote_atual} com {len(pendentes)} transações...")
+        print(f"🔄 Lote {lote_atual}: processando {len(pendentes)} transações...")
 
         for transacao in pendentes:
             try:
@@ -71,13 +75,18 @@ async def processar_em_lotes(
                 )
 
                 total_processadas += 1
+                if status == "suspeito":
+                    suspeitas += 1
+                else:
+                    normais += 1
+
                 if entre_transacoes > 0:
                     await asyncio.sleep(entre_transacoes)
 
             except Exception as e:
                 print(f"⚠️ Erro ao processar transação {transacao.get('transacao_id')}: {e}")
 
-        print(f"✅ Lote {lote_atual} finalizado. Total até agora: {total_processadas}")
+        print(f"✅ Lote {lote_atual} finalizado. Total processadas: {total_processadas}")
         lote_atual += 1
 
         if pausa > 0:
@@ -85,5 +94,7 @@ async def processar_em_lotes(
 
     return JSONResponse(content={
         "msg": f"{total_processadas} transações processadas com sucesso",
-        "lotes_processados": lote_atual - 1
+        "lotes_processados": lote_atual - 1,
+        "normais": normais,
+        "suspeitas": suspeitas
     })
