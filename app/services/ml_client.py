@@ -1,5 +1,4 @@
  # Cliente responsável por se comunicar com o serviço ML
-
 import httpx
 
 ML_API_URL = "https://sua-url-do-modelo/predict"  # url do serviço ML
