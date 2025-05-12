@@ -31,3 +31,4 @@ async def listar_transacoes():
 async def avaliar_transacao(transacao: TransacaoBase):
     # Aqui, os dados JÁ estão validados
     return {"dados": transacao}
+
