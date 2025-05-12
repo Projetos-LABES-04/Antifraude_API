@@ -7,7 +7,6 @@ app = FastAPI()
 # Registrar as rotas
 app.include_router(transacao_router, tags=["Transações"])
 
-
 # Rota para indicar que a API iniciou
 @app.get("/")
 async def root():
