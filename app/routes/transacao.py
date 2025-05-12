@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException,status
+from fastapi import APIRouter, HTTPException,Query
 from app.db.database import db
 from bson import ObjectId  # Para lidar com ObjectId
 from app.schemas.transacao_schema import TransacaoBase
 from app.services.ml_client import chamar_servico_ml 
+from time import sleep
+import asyncio  # para pausa entre transações
 
 router = APIRouter()
 
@@ -35,19 +37,27 @@ async def avaliar_transacao(transacao: TransacaoBase):
 
 
 @router.post("/transacoes/processar_pendentes")
-async def processar_transacoes_sem_status():
+async def processar_em_lotes(
+    lote: int = Query(1000, ge=1, le=10000),
+    pausa: int = Query(2, ge=0, description="Pausa entre os lotes em segundos"),
+    entre_transacoes: float = Query(0.0, ge=0.0, le=2.0, description="Pausa entre transações em segundos")
+):
     """
-    Processa todas as transações sem status.
-    Envia para o modelo ML e atualiza o banco com o resultado.
+    Processa transações pendentes em lotes (ciclos) de N registros.
+    Permite configurar pausa entre os ciclos e entre cada transação.
     """
-    try:
-        transacoes_pendentes = await db["todo_collection"].find({"status": {"$exists": False}}).to_list(length=None)
+    total_processadas = 0
+    lote_atual = 1
 
-        total = 0
-        suspeitas = 0
-        normais = 0
+    while True:
+        pendentes = await db["todo_collection"].find({"status": {"$exists": False}}).to_list(length=lote)
 
-        for transacao in transacoes_pendentes:
+        if not pendentes:
+            break
+
+        print(f"🔄 Processando lote {lote_atual} com {len(pendentes)} transações...")
+
+        for transacao in pendentes:
             try:
                 resultado = await chamar_servico_ml(transacao)
                 status = "suspeito" if resultado == 1 else "normal"
@@ -60,20 +70,20 @@ async def processar_transacoes_sem_status():
                     }}
                 )
 
-                total += 1
-                if status == "suspeito":
-                    suspeitas += 1
-                else:
-                    normais += 1
+                total_processadas += 1
+                if entre_transacoes > 0:
+                    await asyncio.sleep(entre_transacoes)
 
             except Exception as e:
-                print(f"Erro ao processar transação {transacao.get('transacao_id')}: {e}")
+                print(f"⚠️ Erro ao processar transação {transacao.get('transacao_id')}: {e}")
 
-        return {
-            "msg": f"{total} transações processadas com sucesso",
-            "normais": normais,
-            "suspeitas": suspeitas
-        }
+        print(f"✅ Lote {lote_atual} finalizado. Total até agora: {total_processadas}")
+        lote_atual += 1
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao processar transações: {str(e)}")
+        if pausa > 0:
+            sleep(pausa)
+
+    return JSONResponse(content={
+        "msg": f"{total_processadas} transações processadas com sucesso",
+        "lotes_processados": lote_atual - 1
+    })
