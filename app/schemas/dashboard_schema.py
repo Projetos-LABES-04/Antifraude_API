@@ -12,3 +12,4 @@ class DashboardResumo(BaseModel):
     contas_investigadas: int
     fraudes_confirmadas: int
     alertas_recentes: List[AlertaRecente]
+    valor_medio_suspeitas: float
