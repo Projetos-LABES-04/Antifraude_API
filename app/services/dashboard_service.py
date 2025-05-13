@@ -60,6 +60,6 @@ async def obter_dashboard(periodo_inicio: datetime, periodo_fim: datetime) -> Da
         transacoes_suspeitas=transacoes_suspeitas,
         contas_investigadas=contas_investigadas,
         fraudes_confirmadas=fraudes_confirmadas,
-         valor_medio_suspeitas=valor_medio_suspeitas,
+        valor_medio_suspeitas=valor_medio_suspeitas,
         alertas_recentes=alertas
     )
