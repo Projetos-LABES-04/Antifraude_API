@@ -1,15 +1,18 @@
 from fastapi import FastAPI
-
 from app.routes.transacao import router as transacao_router
-
-
+from app.routes import conta
+from app.routes import dashboard
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
-app = FastAPI()
+
+app = FastAPI(debug=True)
+
+
+app.include_router(conta.router)
 
 # Configurações fixas
 SECRET_KEY = "chave_super_secreta"
@@ -58,6 +61,9 @@ async def rota_protegida(token: str = Depends(oauth2_scheme)):
 
 
 
+
+
+app.include_router(dashboard.router)
 
 # Registrar as rotas
 app.include_router(transacao_router, tags=["Transações"])
