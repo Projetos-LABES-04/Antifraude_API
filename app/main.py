@@ -8,7 +8,7 @@ app = FastAPI()
 # CORS para liberar o acesso do front
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # ou "*"
+    allow_origins=["http://localhost:3000"],  # trocar origem quando hospedar front 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
