@@ -1,29 +1,40 @@
 from fastapi import APIRouter
-from schemas.transacao_schema import TransacaoBase
-from schemas.notificacao_schema import NotificacaoBase
-from db import db
+from app.schemas.transacao_schema import TransacaoBase
+from app.schemas.notificacao_schema import NotificacaoBase
+from app.db.database import notificacoes_collection
+from app.db.database import db
 from datetime import datetime
+
 
 router = APIRouter()
 
+# 🔧 Simulação de modelo de ML (substitua isso pelo seu modelo real)
+def modelo_ml_mock(transacao_dict):
+    # Exemplo: retorna "fraude" se valor for maior que 2500
+    return "fraude" if transacao_dict["transacao_valor"] > 2500 else "normal"
+
+# 🚨 Endpoint de verificação de transação
 @router.post("/verificar_transacao")
 async def verificar_transacao(transacao: TransacaoBase):
-    # Aqui você adaptaria o dado para o modelo de ML (FORMATAR AINDA, APÓS MODELO PRONTO)
     transacao_dict = transacao.dict()
 
-    # Chamada ao seu modelo de ML (isso é só ilustrativo)(FORMATAR AINDA, APÓS MODELO PRONTO)
-    resultado_ml = modelo.predict([transacao_dict])[0]
+    # 🔍 Chamada ao modelo de machine learning (aqui simulado)
+    resultado_ml = modelo_ml_mock(transacao_dict)
 
-    # Se for fraude, criar uma notificação no MongoDB
+    # 🚨 Se for fraude, cria notificação automaticamente
     if resultado_ml == "fraude":
         notificacao = NotificacaoBase(
             transacao_id=transacao.transacao_id,
             conta_id=transacao.conta_id,
             cliente_id=transacao.cliente_id,
-            mensagem="Transação suspeita detectada com alto risco.",
-            nivel_risco="alto",  # você pode ajustar com base no score do modelo
+            mensagem="Transação suspeita detectada com comportamento anômalo.",
+            nivel_risco="alto",  # você pode ajustar com base no score
             data=datetime.utcnow(),
+            status="pendente"
         )
-        await db["notificacoes"].insert_one(notificacao.dict())
+        await notificacoes_collection.insert_one(notificacao.dict())
 
-    return {"resultado": resultado_ml}
+    return {
+        "transacao_id": transacao.transacao_id,
+        "resultado": resultado_ml
+    }
