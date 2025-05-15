@@ -14,7 +14,7 @@ class TransacaoBase(BaseModel):
     transacao_tipo: str = Field(..., example="pix")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TransacaoDB(TransacaoBase):
