@@ -23,7 +23,7 @@ async def verificar_transacao(transacao: TransacaoBase):
     resultado_ml, score = modelo_ml_mock(transacao_dict)
 
     if resultado_ml == "fraude":
-        # Definir nível de risco com base no score
+        
         if score >= 0.85:
             nivel_risco = "alto"
         elif score >= 0.5:
