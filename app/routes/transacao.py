@@ -22,7 +22,7 @@ def serialize_document(document):
 async def listar_transacoes():
     try:
         # Consultar todas as transações na coleção "todo_collection"
-        transacoes = await db["todo_collection"].find().to_list(100)  # Limite de 100 documentos
+        transacoes = await db["todo_collection"].find().to_list(300)  # Limite de 100 documentos
 
         # Serializar os documentos para corrigir valores inválidos
         transacoes_serializadas = [serialize_document(doc) for doc in transacoes]
