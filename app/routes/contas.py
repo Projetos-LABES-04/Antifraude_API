@@ -28,9 +28,11 @@ async def listar_resumo_contas():
             }
         ]
 
-        cursor = db["todo_collection"].aggregate(pipeline)
-        cursor =cursor.allow_disk_use(True)
-        resultado =await cursor.to_list(length=None)
+        # 🚫 NÃO use await aqui:
+        cursor = db["todo_collection"].aggregate(pipeline).allow_disk_use(True)
+        
+        # ✅ O await só acontece ao converter o cursor em lista
+        resultado = await cursor.to_list(length=None)
         return resultado
     
     except Exception as e:
