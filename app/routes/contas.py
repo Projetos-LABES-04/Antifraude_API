@@ -1,12 +1,16 @@
 from fastapi import APIRouter , HTTPException
 from app.db.database import db
 from app.schemas.conta_schema import ContaResumo
+from datetime import datetime,timedelta
 
 router = APIRouter()
 
 @router.get("/contas/analise",response_model=list[ContaResumo])
 async def listar_resumo_contas():
     try:
+
+        data_limite = datetime.now() - timedelta(days=90)
+
         pipeline =[
             { "$sort": { "transacao_data": -1 } },
             {
@@ -28,11 +32,7 @@ async def listar_resumo_contas():
             }
         ]
 
-        # 🚫 NÃO use await aqui:
-        cursor = db["todo_collection"].aggregate(pipeline).allow_disk_use(True)
-        
-        # ✅ O await só acontece ao converter o cursor em lista
-        resultado = await cursor.to_list(length=None)
+        resultado = await db["todo_collection"].aggregate(pipeline).to_list(length=None)
         return resultado
     
     except Exception as e:
