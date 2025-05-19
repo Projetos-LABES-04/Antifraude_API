@@ -28,7 +28,9 @@ async def listar_resumo_contas():
             }
         ]
 
-        resultado =await db["todo_collection"].aggregate(pipeline,allowDiskUse=True).to_list(length=None)
+        cursor = db["todo_collection"].aggregate(pipeline)
+        cursor =cursor.allow_disk_use(True)
+        resultado =await cursor.to_list(length=None)
         return resultado
     
     except Exception as e:
