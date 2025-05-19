@@ -21,10 +21,9 @@ def serialize_document(document):
 @router.get("/transacoes")
 async def listar_transacoes():
     try:
-        # Consultar todas as transações na coleção "todo_collection"
-        transacoes = await db["todo_collection"].find().to_list(300)  # Limite de 100 documentos
+        transacoes = await db["todo_collection"].find().to_list(300) 
 
-        # Serializar os documentos para corrigir valores inválidos
+        # corrigir valores inválidos
         transacoes_serializadas = [serialize_document(doc) for doc in transacoes]
 
         return transacoes_serializadas
@@ -44,10 +43,7 @@ async def processar_em_lotes(
     pausa: int = Query(2, ge=0, le=10, description="Pausa entre os lotes (segundos)"),
     entre_transacoes: float = Query(0.05, ge=0.0, le=1.0, description="Pausa entre cada requisição ao ML (segundos)")
 ):
-    """
-    Processa transações pendentes em lotes controlados.
-    Envia para o modelo de ML hospedado e atualiza o banco com o resultado.
-    """
+   
     total_processadas = 0
     suspeitas = 0
     normais = 0
