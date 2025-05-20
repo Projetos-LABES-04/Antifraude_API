@@ -44,6 +44,6 @@ async def verificar_transacao(transacao: TransacaoBase):
     return {
         "transacao_id": transacao.transacao_id,
         "resultado": resultado_ml,
-        "score": round(score, 2)
+        # "score": round(score, 2)
     }
 
