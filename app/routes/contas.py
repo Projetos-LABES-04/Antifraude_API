@@ -9,10 +9,10 @@ router = APIRouter()
 async def listar_resumo_contas():
     try:
 
-        data_limite = datetime.now() - timedelta(days=90)
+        data_limite = datetime.utcnow() - timedelta(days=90)
 
         pipeline =[
-            { "$sort": { "transacao_data": -1 } },
+            { "$match": { "transacao_data": { "$gte": data_limite } } },
             {
                 "$group": {
                     "_id": "$conta_id",
