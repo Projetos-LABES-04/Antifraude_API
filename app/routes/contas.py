@@ -8,11 +8,11 @@ router = APIRouter()
 @router.get("/contas/analise",response_model=list[ContaResumo])
 async def listar_resumo_contas():
     try:
-
         data_limite = datetime.utcnow() - timedelta(days=90)
 
-        pipeline =[
+        pipeline = [
             { "$match": { "transacao_data": { "$gte": data_limite } } },
+            { "$sort": { "transacao_data": -1 } },
             {
                 "$group": {
                     "_id": "$conta_id",
