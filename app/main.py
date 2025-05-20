@@ -4,6 +4,9 @@ from app.routes.transacao import router as transacao_router
 from app.routes import fraude
 from app.routes.contas import router as contas_router
 from app.routes import auth
+from app.routes import notificacoes
+from app.routes import contas
+from app.routes import dashboard
 
 app = FastAPI()
 
@@ -21,6 +24,7 @@ app.add_middleware(
 app.include_router(transacao_router, tags=["Transações"])
 app.include_router(fraude.router, tags=["Verificação de Fraude"])
 app.include_router(contas_router,tags=["Contas"])
+app.include_router(notificacoes.router, tags=["Notificações"])
 app.include_router(auth.router)
 
 @app.get("/")

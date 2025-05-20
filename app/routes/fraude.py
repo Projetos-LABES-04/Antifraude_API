@@ -8,7 +8,7 @@ from datetime import datetime
 
 router = APIRouter()
 
-# 🔧 Simulação de modelo de ML (substitua isso pelo seu modelo real)
+# Simulação de modelo de ML (substitua isso pelo seu modelo real)
 def modelo_ml_mock(transacao_dict):
     valor = transacao_dict["transacao_valor"]
     # Simulando score com base no valor
@@ -16,7 +16,7 @@ def modelo_ml_mock(transacao_dict):
     resultado = "fraude" if score > 0.5 else "normal"
     return resultado, score
 
-# 🚨 Endpoint de verificação de transação
+# Endpoint de verificação de transação
 @router.post("/verificar_transacao")
 async def verificar_transacao(transacao: TransacaoBase):
     transacao_dict = transacao.dict()
