@@ -9,7 +9,5 @@ class AlertaRecente(BaseModel):
 class DashboardResumo(BaseModel):
     total_transacoes: int
     transacoes_suspeitas: int
-    contas_investigadas: int
     fraudes_confirmadas: int
-    alertas_recentes: List[AlertaRecente]
     valor_medio_suspeitas: float
