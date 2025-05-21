@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 class LoginInput(BaseModel):
-    matricula: str
+    matricula: int
     senha: str
