@@ -48,29 +48,33 @@ async def resumo_notificacoes():
             }
         }
     ]
+
     resultado = await notificacoes_collection.aggregate(pipeline).to_list(None)
 
     resumo = {
-        "pendentes": 0,
-        "resolvidas": 0,
-        "visualizadas": 0,
-        "alto_risco": 0,
-        "medio_risco": 0,
+        "pendente": 0,
+        "concluida": 0,
         "baixo_risco": 0,
+        "medio_risco": 0,
+        "alto_risco": 0,
         "total": 0
     }
 
     for r in resultado:
         status = r["_id"]["status"]
         risco = r["_id"]["nivel_risco"]
-        resumo["total"] += r["total"]
+        count = r["total"]
+
+        resumo["total"] += count
+
         if status in resumo:
-            resumo[status] += r["total"]
-        if risco == "alto":
-            resumo["alto_risco"] += r["total"]
+            resumo[status] += count
+
+        if risco == "baixo":
+            resumo["baixo_risco"] += count
         elif risco == "médio":
-            resumo["medio_risco"] += r["total"]
-        elif risco == "baixo":
-            resumo["baixo_risco"] += r["total"]
+            resumo["medio_risco"] += count
+        elif risco == "alto":
+            resumo["alto_risco"] += count
 
     return resumo
