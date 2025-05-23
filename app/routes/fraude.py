@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.schemas.transacao_schema import TransacaoBase
 from app.schemas.notificacao_schema import NotificacaoBase
+from app.schemas.notificacao_schema import StatusNotificacao
 from app.db.database import notificacoes_collection
 from app.db.database import db
 from datetime import datetime
