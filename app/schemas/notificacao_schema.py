@@ -14,7 +14,7 @@ class NotificacaoBase(BaseModel):
     cliente_id: int = Field(..., example=356)
     data: datetime = Field(default_factory=datetime.utcnow)
     mensagem: str = Field(..., example="Transação suspeita detectada.")
-    status: StatusNotificacao = Field(default=StatusNotificacao.pendente)
+    status: StatusNotificacao = Field(default=StatusNotificacao.novo)
     nivel_risco: str = Field(default="alto", example="alto")
 
     # 🔹 Saída: resposta incluindo o _id
