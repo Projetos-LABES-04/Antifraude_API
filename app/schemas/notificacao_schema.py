@@ -4,8 +4,9 @@ from datetime import datetime
 from enum import Enum
 
 class StatusNotificacao(str, Enum):
-    pendente = "pendente"
-    concluida = "concluida"
+    novo = "novo"
+    em_analise = "em_analise"
+    resolvido = "resolvido"
 
 class NotificacaoBase(BaseModel):
     transacao_id: str = Field(..., example="8c6a2055")

@@ -35,9 +35,9 @@ async def verificar_transacao(transacao: TransacaoBase):
             transacao_id=transacao.transacao_id,
             conta_id=transacao.conta_id,
             cliente_id=transacao.cliente_id,
-            mensagem="Transação suspeita detectada com comportamento anômalo.",
-            nivel_risco=nivel_risco,
-            status="pendente"
+            mensagem="Transação suspeita detectada.",
+            nivel_risco="alto",
+            status=StatusNotificacao.novo  # status padrão atualizado
         )
 
         await notificacoes_collection.insert_one(notificacao.dict())
