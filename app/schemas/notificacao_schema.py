@@ -18,5 +18,13 @@ class NotificacaoBase(BaseModel):
     nivel_risco: str = Field(default="alto", example="alto")
 
     # 🔹 Saída: resposta incluindo o _id
-class NotificacaoComID(NotificacaoBase):
-    id: str = Field(..., alias="_id")  # ⬅️ Pega o _id do Mongo
+class NotificacaoComID(BaseModel):
+    id: str = Field(..., alias="_id")
+    mensagem: Optional[str]
+    status: Optional[str]
+    data: Optional[datetime]
+    nivel_risco: Optional[str]
+
+    class Config:
+        allow_population_by_field_name = True
+        orm_mode = True
