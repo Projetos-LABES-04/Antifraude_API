@@ -13,12 +13,3 @@ client = AsyncIOMotorClient(MONGO_URI)
 
 # Selecionar o banco de dados correto
 db = client[MONGODB_DATABASE]
-
-# Define a coleção que será usada
-collection = db["todo_collection"]
-notificacoes_collection = db["notificacoes"]
-
-
-
-
-
