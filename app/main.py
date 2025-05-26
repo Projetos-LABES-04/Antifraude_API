@@ -6,7 +6,6 @@ from app.routes.contas import router as contas_router
 from app.routes import auth
 from app.routes import notificacoes
 from app.routes import contas
-from app.routes import dashboard
 
 app = FastAPI(debug=True)
 
