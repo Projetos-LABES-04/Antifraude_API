@@ -20,6 +20,9 @@ class NotificacaoBase(BaseModel):
     # 🔹 Saída: resposta incluindo o _id
 class NotificacaoComID(BaseModel):
     id: str = Field(..., alias="_id")
+    transacao_id: str
+    conta_id: str
+    cliente_id: int
     mensagem: Optional[str]
     status: Optional[str]
     data: Optional[datetime]
