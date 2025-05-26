@@ -8,7 +8,7 @@ from app.routes import notificacoes
 from app.routes import contas
 from app.routes import dashboard
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 # CORS para liberar o acesso do front
 app.add_middleware(
