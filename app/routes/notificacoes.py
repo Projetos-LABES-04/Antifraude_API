@@ -19,6 +19,8 @@ async def listar_notificacoes(status: Optional[str] = Query(None)):
     # Converte ObjectId para string
     for n in notificacoes:
         n["_id"] = str(n["_id"])
+    print("🔍 Notificações retornadas:", notificacoes)
+        
     return notificacoes
 
 # ✅ PUT /notificacoes/{id}
@@ -34,8 +36,6 @@ async def atualizar_status_notificacao(notificacao_id: str, novo_status: StatusN
         return {"msg": "Status atualizado com sucesso"}
     except Exception:
         raise HTTPException(status_code=400, detail="ID inválido")
-
-    # CONTINUAR MEXENDO NESSA PARTE PRA BAIXO
 
 # 📊 GET /notificacoes/resumo
 @router.get("/notificacoes/resumo")
