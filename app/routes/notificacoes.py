@@ -37,6 +37,15 @@ async def atualizar_status_notificacao(notificacao_id: str, novo_status: StatusN
     except Exception:
         raise HTTPException(status_code=400, detail="ID inválido")
 
+@router.get("/notificacoes/ultimas")
+async def ultimas_notificacoes(qtd: int =5):
+    notificacoes = await notificacoes_collection.find({}).sort("data", -1).limit(qtd).to_list(qtd)
+
+    for n in notificacoes:
+        n["_id"] = str(n["_id"])
+
+    return notificacoes
+
 # 📊 GET /notificacoes/resumo
 @router.get("/notificacoes/resumo")
 async def resumo_notificacoes():
