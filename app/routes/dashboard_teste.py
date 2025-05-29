@@ -2,6 +2,9 @@ from fastapi import APIRouter, Query, HTTPException
 from datetime import datetime
 from app.services.dashboard_service_teste import contar_transacoes_periodo
 
+router = APIRouter()
+
+
 @router.get("/dashboard/quantidade_transacoes")
 async def get_quantidade_transacoes(
     periodo_inicio: str = Query(..., description="Data inicial (formato: YYYY-MM-DD)"),

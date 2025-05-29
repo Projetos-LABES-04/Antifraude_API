@@ -7,6 +7,7 @@ from app.routes import auth
 from app.routes import notificacoes
 from app.routes import dashboard
 from app.routes import contas
+from app.routes.dashboard_teste import router as dashboard_teste
 
 app = FastAPI(debug=True)
 
@@ -27,6 +28,7 @@ app.include_router(contas_router,tags=["Contas"])
 app.include_router(notificacoes.router, tags=["Notificações"])
 app.include_router(auth.router)
 app.include_router(dashboard.router, tags=["Dashboard"])
+app.include_router(dashboard_teste, tags=["Dashboard Teste"])
 
 @app.get("/")
 async def root():
