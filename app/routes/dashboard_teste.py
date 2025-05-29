@@ -6,14 +6,8 @@ router = APIRouter()
 
 
 @router.get("/dashboard/quantidade_transacoes")
-async def get_quantidade_transacoes(
-    periodo_inicio: str = Query(..., description="Data inicial (formato: YYYY-MM-DD)"),
-    periodo_fim: str = Query(..., description="Data final (formato: YYYY-MM-DD)")
+async def contar_transacoes(
+    periodo_inicio: datetime = Query(..., description="Data inicial (ex: 2023-01-01T00:00:00)"),
+    periodo_fim: datetime = Query(..., description="Data final (ex: 2023-01-01T23:59:59)")
 ):
-    try:
-        data_inicio = datetime.strptime(periodo_inicio, "%Y-%m-%d")
-        data_fim = datetime.strptime(periodo_fim, "%Y-%m-%d")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Formato de data inválido. Use YYYY-MM-DD")
-    
-    return await contar_transacoes_periodo(data_inicio, data_fim)
+    return await contar_transacoes_periodo(periodo_inicio, periodo_fim)
