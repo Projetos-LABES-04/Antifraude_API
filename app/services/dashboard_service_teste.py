@@ -11,10 +11,18 @@ async def contar_transacoes_periodo(periodo_inicio: datetime, periodo_fim: datet
         data_atual += timedelta(days=1)
 
     filtro_data = {
-        "transacao_data": {
-            "$regex": f"^({'|'.join(dias)})"
-        }
+    "$expr": {
+        "$in": [
+            { "$substr": ["$transacao_data", 0, 10] },
+            dias
+        ]
     }
+}
+
+
+    print("📅 Dias utilizados no filtro:", dias)
+    print("🔍 Regex usada:", f"^({'|'.join(dias)})")
 
     total = await transacoes_col.count_documents(filtro_data)
     return {"quantidade_transacoes": total}
+
