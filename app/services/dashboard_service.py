@@ -1,39 +1,37 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.schemas.dashboard_schema import DashboardResumo
 from app.db.database import db
 
 async def obter_dashboard(periodo_inicio: datetime, periodo_fim: datetime) -> DashboardResumo:
     transacoes_col = db["transacoes"]
 
-    # Filtro de intervalo direto usando datetime — mais eficiente e com suporte a indexação
-    filtro_data = {
-        "transacao_data": {
-            "$gte": periodo_inicio,
-            "$lte": periodo_fim
-        }
-    }
+    # Converte o intervalo para strings no formato compatível
+    dias = []
+    data_atual = periodo_inicio
+    while data_atual <= periodo_fim:
+        dias.append(data_atual.strftime("%Y-%m-%d"))  # Formato de prefixo usado na string
+        data_atual += timedelta(days=1)
 
-    # Total de transações
+    # Filtros para campos com data como string
+    filtro_data = {"$or": [{"transacao_data": {"$regex": f"^{dia}"}} for dia in dias]}
+
     total_transacoes = await transacoes_col.count_documents(filtro_data)
 
-    # Transações suspeitas
     transacoes_suspeitas = await transacoes_col.count_documents({
-        **filtro_data,
-        "status": "suspeita"
+        "status": "suspeita",
+        **filtro_data
     })
 
-    # Fraudes confirmadas
     fraudes_confirmadas = await transacoes_col.count_documents({
-        **filtro_data,
-        "status": "fraude_confirmada"
+        "status": "fraude_confirmada",
+        **filtro_data
     })
 
-    # Valor médio das suspeitas
     media_resultado = await transacoes_col.aggregate([
         {
             "$match": {
-                **filtro_data,
-                "status": "suspeita"
+                "status": "suspeita",
+                **filtro_data
             }
         },
         {
