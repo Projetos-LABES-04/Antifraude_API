@@ -18,18 +18,19 @@ async def listar_notificacoes(status: Optional[str] = Query(None)):
     
     # Converte ObjectId para string
     for n in notificacoes:
+        print("ANTES:", n)
         n["_id"] = str(n["_id"])
-    print("🔍 Notificações retornadas:", notificacoes)
+        print("DEPOIS:", n)
         
     return notificacoes
 
-# ✅ PUT /notificacoes/{id}
+# PUT /notificacoes/{id}
 @router.put("/notificacoes/{notificacao_id}")
 async def atualizar_status_notificacao(notificacao_id: str, novo_status: StatusNotificacao = Query(...)):
     try:
         resultado = await notificacoes_collection.update_one(
             {"_id": ObjectId(notificacao_id)},
-            {"$set": {"status": novo_status, "data": datetime.utcnow()}}
+            {"$set": {"status": novo_status.value, "data": datetime.utcnow()}}
         )
         if resultado.modified_count == 0:
             raise HTTPException(status_code=404, detail="Notificação não encontrada")
@@ -46,13 +47,16 @@ async def ultimas_notificacoes(qtd: int =5):
 
     return notificacoes
 
-# 📊 GET /notificacoes/resumo
+# GET /notificacoes/resumo
 @router.get("/notificacoes/resumo")
 async def resumo_notificacoes():
     pipeline = [
         {
             "$group": {
-                "_id": {"status": "$status", "nivel_risco": "$nivel_risco"},
+                "_id": {
+                    "status": "$status",
+                    "nivel_risco": "$nivel_risco"
+                },
                 "total": {"$sum": 1}
             }
         }
@@ -61,10 +65,10 @@ async def resumo_notificacoes():
     resultado = await notificacoes_collection.aggregate(pipeline).to_list(None)
 
     resumo = {
-        "pendente": 0,
-        "concluida": 0,
+        "novo": 0,
+        "em_analise": 0,
+        "resolvido": 0,
         "baixo_risco": 0,
-        "medio_risco": 0,
         "alto_risco": 0,
         "total": 0
     }
@@ -76,13 +80,15 @@ async def resumo_notificacoes():
 
         resumo["total"] += count
 
-        if status in resumo:
-            resumo[status] += count
+        if status == "novo":
+            resumo["novo"] += count
+        elif status == "em_analise":
+            resumo["em_analise"] += count
+        elif status == "resolvido":
+            resumo["resolvido"] += count
 
         if risco == "baixo":
             resumo["baixo_risco"] += count
-        elif risco == "médio":
-            resumo["medio_risco"] += count
         elif risco == "alto":
             resumo["alto_risco"] += count
 
