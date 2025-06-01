@@ -21,7 +21,7 @@ def serialize_document(document):
 @router.get("/transacoes")
 async def listar_transacoes():
     try:
-        transacoes = await db["todo_collection"].find().to_list(300) 
+        transacoes = await db["todo_collection"].find().to_list(150) 
 
         # corrigir valores inválidos
         transacoes_serializadas = [serialize_document(doc) for doc in transacoes]
