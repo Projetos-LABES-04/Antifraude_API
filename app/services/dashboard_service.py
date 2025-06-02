@@ -3,7 +3,7 @@ from app.schemas.dashboard_schema import DashboardResumo
 from app.db.database import db
 
 async def obter_dashboard(periodo_inicio: datetime, periodo_fim: datetime) -> DashboardResumo:
-    transacoes_col = db["transacoes"]
+    transacoes_col = db["todo_collection"]
 
     # Converte o intervalo para prefixos de data no formato da string
     dias = []
