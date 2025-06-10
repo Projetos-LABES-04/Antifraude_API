@@ -13,7 +13,7 @@ app = FastAPI(debug=True)
 # CORS para liberar o acesso do front
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://portal-de-analise-em-anomalias-tran-nu.vercel.app/",
+    allow_origins=["https://portal-de-analise-em-anomalias-tran-nu.vercel.app",
     "http://localhost:3000"],  # trocar origem quando hospedar front 
     allow_credentials=True,
     allow_methods=["*"],
