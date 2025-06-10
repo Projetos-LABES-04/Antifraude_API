@@ -4,9 +4,9 @@ from typing import Optional
 
 async def contar_transacoes_periodo(periodo_inicio: Optional[datetime], periodo_fim: Optional[datetime]) -> dict:
     transacoes_col = db["todo_collection"]
+    dias = []
 
     if periodo_inicio and periodo_fim:
-        dias = []
         data_atual = periodo_inicio
         while data_atual <= periodo_fim:
             dias.append(data_atual.strftime("%Y-%m-%d "))
