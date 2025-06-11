@@ -5,14 +5,23 @@ Justificativa: A prevenção de fraudes bancárias exige soluções que identifi
 
 Tecnologias utilizadas:
 
-Backend: Python, FastAPI, MongoDB, Pydantic
+Backend: Python, FastAPI, Pydantic
 
 Machine Learning: TensorFlow (Autoencoder), Scikit-learn (KMeans, ANOVA, GLM)
 
 Frontend: React, Axios
 
-Hospedagem: Render
+Hospedagem: Render, Vercel
+
+Banco de Dados: MongoDB
 
 2. Estrutura do Projeto (A anexar)
 
-3. 
+3. Lógica do Sistema
+3.1. Mapeamento de Comportamento
+
+3.2. Detecção de Anomalias
+
+4. API Antifraude
+
+ 
