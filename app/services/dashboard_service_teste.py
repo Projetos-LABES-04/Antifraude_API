@@ -15,8 +15,8 @@ async def contar_transacoes_periodo(periodo_inicio: datetime, periodo_fim: datet
         "$or": [{"transacao_data": {"$regex": f"^{dia}"}} for dia in dias]
     }
 
-    print("📅 Dias utilizados no filtro:", dias)
-    print("🔎 Filtro montado:", filtro_data)
+    print("Dias utilizados no filtro:", dias)
+    print("Filtro montado:", filtro_data)
 
     total = await transacoes_col.count_documents(filtro_data)
     return {"quantidade_transacoes": total}

@@ -13,7 +13,7 @@ async def obter_dashboard(periodo_inicio: datetime, periodo_fim: datetime) -> Da
         data_atual += timedelta(days=1)
 
     # Log temporário para debug
-    print("📅 Dias filtrados:", dias)
+    print("Dias filtrados:", dias)
 
     # Filtro otimizado com regex combinando múltiplos dias (mais robusto)
     filtro_data = {

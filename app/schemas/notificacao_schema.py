@@ -17,7 +17,7 @@ class NotificacaoBase(BaseModel):
     status: StatusNotificacao = Field(default=StatusNotificacao.novo)
     nivel_risco: str = Field(default="alto", example="alto")
 
-    # 🔹 Saída: resposta incluindo o _id
+    # Saída: resposta incluindo o _id
 class NotificacaoComID(BaseModel):
     id: str = Field(..., alias="_id")
     transacao_id: str
