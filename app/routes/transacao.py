@@ -8,27 +8,36 @@ import asyncio  # para pausa entre transações
 from fastapi.responses import JSONResponse
 from datetime import datetime
 from typing import Optional
+from dateutil.parser import parse
+
 
 router = APIRouter()
 
 # Função para converter ObjectId para string e corrigir valores inválidos
 def serialize_document(document):
-    document["_id"] = str(document["_id"])  # Converte ObjectId para string
+    document["_id"] = str(document["_id"])
+    for key, value in document.items():
+        if isinstance(value, float) and (
+            value == float("inf") or
+            value == float("-inf") or
+            value != value  # NaN
+        ):
+            document[key] = None
     return document
 
 @router.get("/transacoes")
 async def listar_transacoes(
-    limit:int = Query(50,ge=1,le=1000),
-    skip:int = Query(0,ge=0),
+    limit: int = Query(50, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
     conta: Optional[str] = None,
     status: Optional[str] = None,
     valor_min: Optional[float] = None,
     valor_max: Optional[float] = None,
     data_inicio: Optional[str] = None,
     data_fim: Optional[str] = None,
-): 
+):
     try:
-        filtro ={}
+        filtro = {}
         if conta:
             filtro["conta_id"] = conta
         if status:
@@ -40,17 +49,21 @@ async def listar_transacoes(
             if valor_max is not None:
                 filtro["transacao_valor"]["$lte"] = valor_max
         if data_inicio and data_fim:
-            filtro["transacao_data"] = {
-                "$gte": datetime.fromisoformat(data_inicio),
-                "$lte": datetime.fromisoformat(data_fim)
-            }
+            try:
+                inicio = parse(data_inicio)
+                fim = parse(data_fim)
+                filtro["transacao_data"] = {"$gte": inicio, "$lte": fim}
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Erro ao converter datas: {str(e)}")
+
         total = await db["todo_collection"].count_documents(filtro)
         transacoes = await db["todo_collection"].find(filtro).skip(skip).limit(limit).to_list(length=limit)
 
-        return{
+        return {
             "total": total,
             "dados": [serialize_document(t) for t in transacoes]
         }
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao listar transações: {str(e)}")
 
