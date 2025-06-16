@@ -26,7 +26,33 @@ async def listar_transacoes(
     valor_max: Optional[float] = None,
     data_inicio: Optional[str] = None,
     data_fim: Optional[str] = None,
-):
+): 
+    try:
+        filtro ={}
+        if conta:
+            filtro["conta_id"] = conta
+        if status:
+            filtro["status"] = status
+        if valor_min is not None or valor_max is not None:
+            filtro["transacao_valor"] = {}
+            if valor_min is not None:
+                filtro["transacao_valor"]["$gte"] = valor_min
+            if valor_max is not None:
+                filtro["transacao_valor"]["$lte"] = valor_max
+        if data_inicio and data_fim:
+            filtro["transacao_data"] = {
+                "$gte": datetime.fromisoformat(data_inicio),
+                "$lte": datetime.fromisoformat(data_fim)
+            }
+        total = await db["todo_collection"].count_documents(filtro)
+        transacoes = await db["todo_collection"].find(filtro).skip(skip).limit(limit).to_list(length=limit)
+
+        return{
+            "total": total,
+            "dados": [serialize_document(t) for t in transacoes]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao listar transações: {str(e)}")
 
 
 @router.post("/avaliar")
