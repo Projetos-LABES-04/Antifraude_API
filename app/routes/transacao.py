@@ -6,6 +6,9 @@ from app.services.ml_client import chamar_servico_ml
 from time import sleep
 import asyncio  # para pausa entre transações
 from fastapi.responses import JSONResponse
+from datetime import datetime
+from typing import Optional
+from dateutil.parser import parse
 
 
 router = APIRouter()
@@ -14,21 +17,55 @@ router = APIRouter()
 def serialize_document(document):
     document["_id"] = str(document["_id"])
     for key, value in document.items():
-        if isinstance(value, float) and (value == float("inf") or value == float("-inf") or value != value):  # Verifica NaN, inf e -inf
-            document[key] = None  # Substitui valores inválidos por None
+        if isinstance(value, float) and (
+            value == float("inf") or
+            value == float("-inf") or
+            value != value  # NaN
+        ):
+            document[key] = None
     return document
 
 @router.get("/transacoes")
-async def listar_transacoes():
+async def listar_transacoes(
+    limit: int = Query(50, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    conta: Optional[str] = None,
+    status: Optional[str] = None,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None,
+):
     try:
-        transacoes = await db["todo_collection"].find().to_list(150) 
+        filtro = {}
+        if conta:
+            filtro["conta_id"] = conta
+        if status:
+            filtro["status"] = status
+        if valor_min is not None or valor_max is not None:
+            filtro["transacao_valor"] = {}
+            if valor_min is not None:
+                filtro["transacao_valor"]["$gte"] = valor_min
+            if valor_max is not None:
+                filtro["transacao_valor"]["$lte"] = valor_max
+        if data_inicio and data_fim:
+            try:
+                inicio = parse(data_inicio)
+                fim = parse(data_fim)
+                filtro["transacao_data"] = {"$gte": inicio, "$lte": fim}
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Erro ao converter datas: {str(e)}")
 
-        # corrigir valores inválidos
-        transacoes_serializadas = [serialize_document(doc) for doc in transacoes]
+        total = await db["todo_collection"].count_documents(filtro)
+        transacoes = await db["todo_collection"].find(filtro).skip(skip).limit(limit).to_list(length=limit)
 
-        return transacoes_serializadas
+        return {
+            "total": total,
+            "dados": [serialize_document(t) for t in transacoes]
+        }
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao listar transações: {str(e)}")
 
 
 @router.post("/avaliar")
