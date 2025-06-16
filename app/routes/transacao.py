@@ -6,7 +6,8 @@ from app.services.ml_client import chamar_servico_ml
 from time import sleep
 import asyncio  # para pausa entre transações
 from fastapi.responses import JSONResponse
-
+from datetime import datetime
+from typing import Optional
 
 router = APIRouter()
 
