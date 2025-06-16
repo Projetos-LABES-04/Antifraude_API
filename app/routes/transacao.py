@@ -13,23 +13,20 @@ router = APIRouter()
 
 # Função para converter ObjectId para string e corrigir valores inválidos
 def serialize_document(document):
-    document["_id"] = str(document["_id"])
-    for key, value in document.items():
-        if isinstance(value, float) and (value == float("inf") or value == float("-inf") or value != value):  # Verifica NaN, inf e -inf
-            document[key] = None  # Substitui valores inválidos por None
+    document["_id"] = str(document["_id"])  # Converte ObjectId para string
     return document
 
 @router.get("/transacoes")
-async def listar_transacoes():
-    try:
-        transacoes = await db["todo_collection"].find().to_list(150) 
-
-        # corrigir valores inválidos
-        transacoes_serializadas = [serialize_document(doc) for doc in transacoes]
-
-        return transacoes_serializadas
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao consultar o banco de dados: {str(e)}")
+async def listar_transacoes(
+    limit:int = Query(50,ge=1,le=1000),
+    skip:int = Query(0,ge=0),
+    conta: Optional[str] = None,
+    status: Optional[str] = None,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None,
+):
 
 
 @router.post("/avaliar")
