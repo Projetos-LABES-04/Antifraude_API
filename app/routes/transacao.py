@@ -58,7 +58,8 @@ async def listar_transacoes(
 
         total = await db["todo_collection"].count_documents(filtro)
         transacoes = await db["todo_collection"].find(filtro).skip(skip).limit(limit).to_list(length=limit)
-
+        
+        print("Filtro aplicado:", filtro)
         return {
             "total": total,
             "dados": [serialize_document(t) for t in transacoes]
