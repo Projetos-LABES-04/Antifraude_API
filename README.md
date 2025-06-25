@@ -24,4 +24,7 @@ Banco de Dados: MongoDB
 
 4. API Antifraude
 
+5. comando inicialização uvicorn:
+   uvicorn app.main:app --reload
+
  
