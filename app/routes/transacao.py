@@ -96,6 +96,8 @@ async def processar_em_lotes(
 
         for transacao in pendentes:
             try:
+                transacao["_id"] = str(transacao["_id"])  # Converter ObjectId para string
+
                 resultado = await chamar_servico_ml(transacao)
                 status = "suspeito" if resultado == 1 else "normal"
 
