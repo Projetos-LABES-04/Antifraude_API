@@ -87,6 +87,11 @@ async def processar_em_lotes(
     normais = 0
     lote_atual = 1
 
+    CAMPOS_OBRIGATORIOS = {
+        "transacao_id", "cliente_id", "conta_id", "conta_destino_id",
+        "mesma_titularidade", "transacao_data", "transacao_valor", "transacao_tipo"
+    }
+
     while True:
         pendentes = await db["todo_collection"].find({"status": {"$exists": False}}).to_list(length=lote)
         if not pendentes:
@@ -97,6 +102,11 @@ async def processar_em_lotes(
         for transacao in pendentes:
             try:
                 transacao["_id"] = str(transacao["_id"])  # Converter ObjectId para string
+
+                 # Verifica campos obrigatórios
+                if not CAMPOS_OBRIGATORIOS.issubset(transacao):
+                    print(f"⚠️ Transação {transacao.get('transacao_id')} ignorada: campos ausentes.")
+                    continue
 
                 resultado = await chamar_servico_ml(transacao)
                 status = "suspeito" if resultado == 1 else "normal"
