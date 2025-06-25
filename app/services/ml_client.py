@@ -1,5 +1,6 @@
  # Cliente responsável por se comunicar com o serviço ML
 import httpx
+from datetime import datetime
 
 ML_API_URL = "https://web-production-995a.up.railway.app/inferencia"
 
