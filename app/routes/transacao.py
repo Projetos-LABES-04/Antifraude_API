@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 from typing import Optional
 from dateutil.parser import parse
+import math
 
 
 router = APIRouter()
@@ -107,6 +108,12 @@ async def processar_em_lotes(
                 if not CAMPOS_OBRIGATORIOS.issubset(transacao):
                     print(f"⚠️ Transação {transacao.get('transacao_id')} ignorada: campos ausentes.")
                     continue
+
+                  # Remove valores inválidos
+                for campo, valor in transacao.items():
+                    if isinstance(valor, float) and (math.isinf(valor) or math.isnan(valor)):
+                        print(f"⚠️ Transação {transacao.get('transacao_id')} ignorada: valor inválido em '{campo}'")
+                        continue
 
                 resultado = await chamar_servico_ml(transacao)
                 status = "suspeito" if resultado == 1 else "normal"
