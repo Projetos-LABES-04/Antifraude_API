@@ -103,7 +103,9 @@ async def processar_em_lotes(
                     {"_id": transacao["_id"]},
                     {"$set": {
                         "status": status,
-                        "fraude_binario": resultado
+                        "fraude_binario": resultado["decisao_final"],
+                        "nivel_suspeita": resultado.get("nivel_suspeita"),
+                        "motivo_alerta": resultado.get("motivo_alerta")
                     }}
                 )
 
