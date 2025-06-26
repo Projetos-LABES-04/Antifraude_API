@@ -146,14 +146,13 @@ async def processar_em_lotes(
             total_processadas += 1
             if status == "suspeito":
                 suspeitas += 1
-                if resultado.get("nivel_suspeita") in ["media", "alta"]:
-                    await db["notificacoes"].insert_one({
-                        "transacao_id": transacao["transacao_id"],
-                        "mensagem": f"Transação suspeita detectada na conta {transacao['conta_id']}",
-                        "nivel_risco": resultado.get("nivel_suspeita"),
-                        "status": "novo",
-                        "data": datetime.utcnow()
-                    })
+                await db["notificacoes"].insert_one({
+                    "transacao_id": transacao["transacao_id"],
+                    "mensagem": f"Transação suspeita detectada na conta {transacao['conta_id']}",
+                    "nivel_risco": resultado.get("nivel_suspeita", "media"),
+                    "status": "novo",
+                    "data": datetime.utcnow()
+                })
             else:
                 normais += 1
 
