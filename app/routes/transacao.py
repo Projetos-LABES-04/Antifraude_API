@@ -42,7 +42,10 @@ async def listar_transacoes(
         if conta:
             filtro["conta_id"] = conta
         if status:
-            filtro["status"] = status
+            if status =="análise":
+                filtro["status"] = {"$exists":False}
+            else:
+                filtro["status"] = status
         if valor_min is not None or valor_max is not None:
             filtro["transacao_valor"] = {}
             if valor_min is not None:
