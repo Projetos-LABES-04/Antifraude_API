@@ -25,16 +25,24 @@ async def total_transacoes_suspeitas(
     data_inicio: datetime = Query(None),
     data_fim: datetime = Query(None)
 ):
-    filtro = {"status": "suspeito"}
-
+    filtro_data = {}
     if data_inicio and data_fim:
-        # converte datetime -> string no mesmo formato armazenado
-        data_inicio_str = data_inicio.strftime("%Y-%m-%d %H:%M:%S")
-        data_fim_str = data_fim.strftime("%Y-%m-%d %H:%M:%S")
-        filtro["transacao_data"] = {"$gte": data_inicio_str, "$lte": data_fim_str}
+        data_inicio_str = data_inicio.strftime("%Y-%m-%dT%H:%M:%S")
+        data_fim_str = data_fim.strftime("%Y-%m-%dT%H:%M:%S")
+        filtro_data = {"transacao_data": {"$gte": data_inicio_str, "$lte": data_fim_str}}
 
-    total = await db["todo_collection"].count_documents(filtro)
-    return {"total_suspeitas": total}
+    filtro_suspeitas = {"status": "suspeito", **filtro_data}
+    filtro_total = filtro_data.copy()
+
+    total_suspeitas = await db["todo_collection"].count_documents(filtro_suspeitas)
+    total_base = await db["todo_collection"].count_documents(filtro_total)
+
+    perc_suspeitas = round((total_suspeitas / total_base) * 100, 2) if total_base > 0 else 0.0
+
+    return {
+        "total_suspeitas": total_suspeitas,
+        "perc_suspeitas": perc_suspeitas
+    }
 
 @router.get("/dashboard/valor_medio_suspeitas")
 async def valor_medio_transacoes_suspeitas(
@@ -74,12 +82,45 @@ async def total_transacoes_nao_analisadas(
     data_inicio: datetime = Query(None),
     data_fim: datetime = Query(None)
 ):
-    filtro = {"status": {"$exists": False}}
-
+    filtro_data = {}
     if data_inicio and data_fim:
         data_inicio_str = data_inicio.strftime("%Y-%m-%dT%H:%M:%S")
         data_fim_str = data_fim.strftime("%Y-%m-%dT%H:%M:%S")
-        filtro["transacao_data"] = {"$gte": data_inicio_str, "$lte": data_fim_str}
+        filtro_data = {"transacao_data": {"$gte": data_inicio_str, "$lte": data_fim_str}}
 
-    total = await db["todo_collection"].count_documents(filtro)
-    return {"total_nao_analisadas": total}
+    filtro_nao_analisadas = {"status": {"$exists": False}, **filtro_data}
+    filtro_total = filtro_data.copy()
+
+    total_nao_analisadas = await db["todo_collection"].count_documents(filtro_nao_analisadas)
+    total_base = await db["todo_collection"].count_documents(filtro_total)
+
+    perc_nao_analisadas = round((total_nao_analisadas / total_base) * 100, 2) if total_base > 0 else 0.0
+
+    return {
+        "total_nao_analisadas": total_nao_analisadas,
+        "perc_nao_analisadas": perc_nao_analisadas
+    }
+
+@router.get("/dashboard/transacoes_analisadas")
+async def total_transacoes_analisadas(
+    data_inicio: datetime = Query(None),
+    data_fim: datetime = Query(None)
+):
+    filtro_data = {}
+    if data_inicio and data_fim:
+        data_inicio_str = data_inicio.strftime("%Y-%m-%dT%H:%M:%S")
+        data_fim_str = data_fim.strftime("%Y-%m-%dT%H:%M:%S")
+        filtro_data = {"transacao_data": {"$gte": data_inicio_str, "$lte": data_fim_str}}
+
+    filtro_analisadas = {"status": {"$exists": True}, **filtro_data}
+    filtro_total = filtro_data.copy()
+
+    total_analisadas = await db["todo_collection"].count_documents(filtro_analisadas)
+    total_base = await db["todo_collection"].count_documents(filtro_total)
+
+    perc_analisadas = round((total_analisadas / total_base) * 100, 2) if total_base > 0 else 0.0
+
+    return {
+        "total_analisadas": total_analisadas,
+        "perc_analisadas": perc_analisadas
+    }
