@@ -132,6 +132,7 @@ async def processar_em_lotes(
 
                 total_processadas += 1
                 if status == "suspeito":
+                    print(f"🔔 Criando notificação para {transacao['transacao_id']}")
                     suspeitas += 1
                     # Criar notificação
                     await db["notificacoes"].insert_one({
