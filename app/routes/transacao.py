@@ -104,7 +104,7 @@ def corrigir_valores(transacao):
 @router.post("/transacoes/processar_pendentes")
 async def processar_em_lotes(
     lote: int = Query(100, ge=100, le=2000),
-    entre_transacoes: float = Query(0.05, ge=0.0, le=1.0)
+    entre_transacoes: float = Query(0.01, ge=0.0, le=1.0)
 ):
     total_processadas = 0
     suspeitas = 0
@@ -146,13 +146,14 @@ async def processar_em_lotes(
             total_processadas += 1
             if status == "suspeito":
                 suspeitas += 1
-                await db["notificacoes"].insert_one({
-                    "transacao_id": transacao["transacao_id"],
-                    "mensagem": f"Transação suspeita detectada na conta {transacao['conta_id']}",
-                    "nivel_risco": resultado.get("nivel_suspeita", "medio"),
-                    "status": "novo",
-                    "data": datetime.utcnow()
-                })
+                if resultado.get("nivel_suspeita") in ["media", "alta"]:
+                    await db["notificacoes"].insert_one({
+                        "transacao_id": transacao["transacao_id"],
+                        "mensagem": f"Transação suspeita detectada na conta {transacao['conta_id']}",
+                        "nivel_risco": resultado.get("nivel_suspeita"),
+                        "status": "novo",
+                        "data": datetime.utcnow()
+                    })
             else:
                 normais += 1
 
