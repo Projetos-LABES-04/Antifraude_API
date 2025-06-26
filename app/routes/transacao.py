@@ -77,89 +77,95 @@ async def listar_transacoes(
 async def avaliar_transacao(transacao: TransacaoBase):
     return {"dados": transacao}
 
+def corrigir_valores(transacao):
+    """Corrige campos inválidos com valores padrão razoáveis."""
+    campos_default = {
+        "transacao_valor": 0.0,
+        "transacao_data": "2023-01-01 00:00:00",
+        "transacao_tipo": "pix",
+        "cliente_id": -1,
+        "conta_id": "desconhecido",
+        "conta_destino_id": "desconhecido",
+        "mesma_titularidade": False,
+    }
 
-# Rota para processar transações pendentes em lotes
+    for campo, default in campos_default.items():
+        valor = transacao.get(campo)
+
+        if isinstance(valor, str) and valor.lower() in ["inf", "nan", ""]:
+            transacao[campo] = default
+        elif isinstance(valor, float) and (math.isinf(valor) or math.isnan(valor)):
+            transacao[campo] = default
+        elif valor is None:
+            transacao[campo] = default
+
+    return transacao
+
 @router.post("/transacoes/processar_pendentes")
 async def processar_em_lotes(
     lote: int = Query(100, ge=100, le=2000),
-    pausa: int = Query(1, ge=0, le=10, description="Pausa entre os lotes (segundos)"),
-    entre_transacoes: float = Query(0.01, ge=0.0, le=1.0, description="Pausa entre cada requisição ao ML (segundos)")
+    entre_transacoes: float = Query(0.05, ge=0.0, le=1.0)
 ):
-   
     total_processadas = 0
     suspeitas = 0
     normais = 0
-    lote_atual = 1
 
     CAMPOS_OBRIGATORIOS = {
         "transacao_id", "cliente_id", "conta_id", "conta_destino_id",
         "mesma_titularidade", "transacao_data", "transacao_valor", "transacao_tipo"
     }
 
-    while True:
-        pendentes = await db["todo_collection"].find({"status": {"$exists": False}}).to_list(length=lote)
-        if not pendentes:
-            break
+    pendentes = await db["todo_collection"].find({"status": {"$exists": False}}).to_list(length=lote)
+    print(f"🔄 Processando {len(pendentes)} transações...")
 
-        print(f"🔄 Lote {lote_atual}: processando {len(pendentes)} transações...")
+    for transacao in pendentes:
+        try:
+            transacao["_id"] = str(transacao["_id"])
 
-        for transacao in pendentes:
-            try:
-                transacao["_id"] = str(transacao["_id"])  # Converter ObjectId para string
+            if not CAMPOS_OBRIGATORIOS.issubset(transacao):
+                print(f"⚠️ Transação {transacao.get('transacao_id')} ignorada: campos ausentes.")
+                continue
 
-                 # Verifica campos obrigatórios
-                if not CAMPOS_OBRIGATORIOS.issubset(transacao):
-                    print(f"⚠️ Transação {transacao.get('transacao_id')} ignorada: campos ausentes.")
-                    continue
+            transacao = corrigir_valores(transacao)
 
-                # Verifica se há algum valor inválido
-                if any(isinstance(v, float) and (math.isinf(v) or math.isnan(v)) for v in transacao.values()):
-                    print(f"⚠️ Transação {transacao.get('transacao_id')} ignorada: contém valor inválido (inf ou NaN).")
-                    continue
+            print(f"✅ Transação {transacao['transacao_id']} será processada pelo modelo")
 
-                resultado = await chamar_servico_ml(transacao)
-                status = "suspeito" if resultado["decisao_final"] == 1 else "normal"
+            resultado = await chamar_servico_ml(transacao)
+            status = "suspeito" if resultado["decisao_final"] == 1 else "normal"
 
-                await db["todo_collection"].update_one(
-                    {"_id": ObjectId(transacao["_id"])},
-                    {"$set": {
-                        "status": status,
-                        "fraude_binario": resultado["decisao_final"],
-                        "nivel_suspeita": resultado.get("nivel_suspeita"),
-                        "motivo_alerta": resultado.get("motivo_alerta")
-                    }}
-                )
+            await db["todo_collection"].update_one(
+                {"_id": ObjectId(transacao["_id"])},
+                {"$set": {
+                    "status": status,
+                    "fraude_binario": resultado["decisao_final"],
+                    "nivel_suspeita": resultado.get("nivel_suspeita"),
+                    "motivo_alerta": resultado.get("motivo_alerta")
+                }}
+            )
 
-                total_processadas += 1
-                if status == "suspeito":
-                    print(f"🔔 Criando notificação para {transacao['transacao_id']}")
-                    suspeitas += 1
-                    # Criar notificação
-                    await db["notificacoes"].insert_one({
-                        "transacao_id": transacao["transacao_id"],
-                        "mensagem": f"Transação suspeita detectada na conta {transacao['conta_id']}",
-                        "nivel_risco": resultado.get("nivel_suspeita", "medio"),  # 'baixa', 'media', 'alta'
-                        "status": "novo",
-                        "data": datetime.utcnow()
-                    })
-                else:
-                    normais += 1
+            total_processadas += 1
+            if status == "suspeito":
+                suspeitas += 1
+                await db["notificacoes"].insert_one({
+                    "transacao_id": transacao["transacao_id"],
+                    "mensagem": f"Transação suspeita detectada na conta {transacao['conta_id']}",
+                    "nivel_risco": resultado.get("nivel_suspeita", "medio"),
+                    "status": "novo",
+                    "data": datetime.utcnow()
+                })
+            else:
+                normais += 1
 
-                if entre_transacoes > 0:
-                    await asyncio.sleep(entre_transacoes)
+            if entre_transacoes > 0:
+                await asyncio.sleep(entre_transacoes)
 
-            except Exception as e:
-                print(f"⚠️ Erro ao processar transação {transacao.get('transacao_id')}: {e}")
+        except Exception as e:
+            print(f"⚠️ Erro ao processar transação {transacao.get('transacao_id')}: {e}")
 
-        print(f"✅ Lote {lote_atual} finalizado. Total processadas: {total_processadas}")
-        lote_atual += 1
-
-        if pausa > 0:
-            sleep(pausa)
+    print(f"✅ Lote finalizado. Total processadas: {total_processadas}")
 
     return JSONResponse(content={
         "msg": f"{total_processadas} transações processadas com sucesso",
-        "lotes_processados": lote_atual - 1,
         "normais": normais,
         "suspeitas": suspeitas
     })
