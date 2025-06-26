@@ -1,7 +1,8 @@
-1. Introdução
-Objetivo do projeto: Desenvolver um sistema antifraude capaz de identificar comportamentos típicos de contas bancárias com base no histórico de transações e detectar possíveis anomalias em tempo real.
+ OBJETIVO
+ -
+__________________________________________________________________________________________________________________________________________________________________________________
+Desenvolver um sistema antifraude capaz de identificar comportamentos típicos de contas bancárias com base no histórico de transações e detectar possíveis anomalias em tempo real.
 
-Justificativa: A prevenção de fraudes bancárias exige soluções que identifiquem desvios de comportamento com base em padrões históricos. A aplicação de técnicas de machine learning permite antecipar ações suspeitas com maior precisão.
 
 Tecnologias utilizadas:
 
