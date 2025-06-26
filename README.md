@@ -1,6 +1,5 @@
- OBJETIVO
+ OBJETIVO:
  -
-__________________________________________________________________________________________________________________________________________________________________________________
 Desenvolver um sistema antifraude capaz de identificar comportamentos típicos de contas bancárias com base no histórico de transações e detectar possíveis anomalias em tempo real.
 
 
