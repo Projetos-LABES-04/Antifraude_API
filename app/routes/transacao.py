@@ -81,9 +81,9 @@ async def avaliar_transacao(transacao: TransacaoBase):
 # Rota para processar transações pendentes em lotes
 @router.post("/transacoes/processar_pendentes")
 async def processar_em_lotes(
-    lote: int = Query(1000, ge=100, le=2000),
-    pausa: int = Query(2, ge=0, le=10, description="Pausa entre os lotes (segundos)"),
-    entre_transacoes: float = Query(0.05, ge=0.0, le=1.0, description="Pausa entre cada requisição ao ML (segundos)")
+    lote: int = Query(100, ge=100, le=2000),
+    pausa: int = Query(1, ge=0, le=10, description="Pausa entre os lotes (segundos)"),
+    entre_transacoes: float = Query(0.01, ge=0.0, le=1.0, description="Pausa entre cada requisição ao ML (segundos)")
 ):
    
     total_processadas = 0
