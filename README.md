@@ -67,7 +67,7 @@ Banco de Dados: MongoDB
 comando inicialização uvicorn:
    uvicorn app.main:app --reload
 
-##CONCLUSÃO:
+ CONCLUSÃO:
  -
 O sistema antifraude entrega uma solução robusta, baseada em inteligência artificial, para análise de transações bancárias. Ele permite detectar rapidamente desvios comportamentais por conta e classificar o nível de suspeita com justificativas interpretáveis. A ferramenta visa fortalecer a segurança operacional e apoiar investigações da equipe de controle.
 _____________________________________________________________________________________________________________________________________________________________________________________________________________________
