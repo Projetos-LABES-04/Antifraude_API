@@ -68,3 +68,18 @@ async def valor_medio_transacoes_suspeitas(
         return {"valor_medio": round(resultado[0]["valor_medio"], 2)}
     else:
         return {"valor_medio": 0.0}
+    
+@router.get("/dashboard/transacoes_analisadas")
+async def total_transacoes_analisadas(
+    data_inicio: datetime = Query(None),
+    data_fim: datetime = Query(None)
+):
+    filtro = {"status": {"$exists": True}}
+
+    if data_inicio and data_fim:
+        data_inicio_str = data_inicio.strftime("%Y-%m-%dT%H:%M:%S")
+        data_fim_str = data_fim.strftime("%Y-%m-%dT%H:%M:%S")
+        filtro["transacao_data"] = {"$gte": data_inicio_str, "$lte": data_fim_str}
+
+    total = await db["todo_collection"].count_documents(filtro)
+    return {"total_analisadas": total}
