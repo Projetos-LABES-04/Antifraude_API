@@ -37,33 +37,53 @@ Banco de Dados: MongoDB
 
  ESTRUTURA DO PROJETO:
 -
-.
+
+antifraude_api/
+│
 ├── app/
-│   ├── db/                         
-│   ├── routes/                     
-│   │   ├── auth.py
-│   │   ├── contas.py
-│   │   ├── dashboard_teste.py
-│   │   ├── fraude.py
-│   │   ├── notificacoes.py
-│   │   ├── transacao.py
-│   │   └── usuario.py
-│   ├── schemas/                    
-│   │   ├── auth_schema.py
-│   │   ├── conta_schema.py
-│   │   ├── dashboard_schema.py
-│   │   ├── notificacao_schema.py
-│   │   └── transacao_schema.py
-│   ├── scripts/                    
-│   │   └── criar_hash.py
-│   ├── services/                   
-│   │   ├── dashboard_service.py
-│   │   ├── dashboard_service_teste.py
-│   │   └── ml_client.py
-│   ├── utils/                     
-│   └── main.py                     
-├── requirements.txt                
-├── .gitignore                                           
+│   ├── main.py                     
+│   ├── config.py                    
+│   ├── database/
+│   │   ├── mongodb.py             
+│   │   └── schemas/                 
+│   ├── models/
+│   │   ├── transacao.py            
+│   │   ├── conta.py                
+│   │   ├── cliente.py             
+│   │   └── notificacao.py         
+│   ├── routes/
+│   │   ├── transacoes.py            
+│   │   ├── contas.py                
+│   │   ├── notificacoes.py          
+│   │   ├── dashboard.py             
+│   │   └── auth.py                  
+│   ├── services/
+│   │   ├── inferencia_comportamento.py  
+│   │   ├── inferencia_anomalia.py       
+│   │   └── notificacoes.py              
+│   ├── utils/
+│   │   ├── pre_processamento.py         
+│   │   ├── auth_utils.py                
+│   │   └── logger.py                    
+│   └── tests/
+│       ├── test_transacoes.py           
+│       ├── test_dashboard.py            
+│       └── conftest.py                 
+│
+├── modelos/                              
+│   ├── scaler.pkl
+│   ├── modelo_autoencoder.keras
+│   ├── kmeans_auto.pkl
+│   ├── modelo_xgboost.pkl
+│   └── ...
+│
+├── .env                                  
+├── requirements.txt                      
+├── README.md                             
+├── Procfile                              
+└── start.sh 
+
+
 comando inicialização uvicorn:
    uvicorn app.main:app --reload
 
