@@ -12,7 +12,7 @@ Desenvolver um sistema antifraude capaz de identificar transações financeiras 
 -
 As transações representam movimentações realizadas por clientes, como saques, transferências e pagamentos. A análise dessas transações permite identificar perfis de comportamento e detectar possíveis desvios com base em padrões históricos.
 
-##INTRODUÇÃO:
+ INTRODUÇÃO:
 -
 A aplicação combina técnicas de aprendizado não supervisionado (Autoencoder + KMeans), regras heurísticas e modelos supervisionados (XGBoost) para identificar comportamentos anômalos em transações financeiras. O objetivo é apoiar a equipe de controle na identificação rápida de possíveis fraudes em contas bancárias. Toda a solução foi construída em Python, com uma API desenvolvida em FastAPI, integração com MongoDB e uma interface de visualização criada em Angular, proporcionando uma experiência completa de análise, monitoramento e gestão de alertas.
 
