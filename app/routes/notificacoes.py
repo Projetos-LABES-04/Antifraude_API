@@ -4,26 +4,42 @@ from bson import ObjectId
 from app.db.database import notificacoes_collection
 from app.schemas.notificacao_schema import NotificacaoBase, NotificacaoComID, StatusNotificacao
 from datetime import datetime
+import math
 
 router = APIRouter()
 
 @router.get("/notificacoes", response_model=List[NotificacaoComID])
 async def listar_notificacoes(status: Optional[str] = Query(None)):
-    """
-    Retorna todas as notificações, ordenadas por data decrescente.
-    É possível filtrar por status: pendente, resolvida, visualizada...
-    """
     filtro = {"status": status} if status else {}
     notificacoes = await notificacoes_collection.find(filtro).sort("data", -1).to_list(100)
-    
-    # Converte ObjectId para string
-    for n in notificacoes:
-        print("ANTES:", n)
-        n["_id"] = str(n["_id"])
-        print("DEPOIS:", n)
-        
-    return notificacoes
 
+    resultados = []
+
+    for n in notificacoes:
+        try:
+            n["_id"] = str(n["_id"])
+            
+            # Corrigir campos obrigatórios
+            if isinstance(n.get("transacao_id"), float) and math.isinf(n["transacao_id"]):
+                n["transacao_id"] = "indefinido"
+            elif n.get("transacao_id") is None:
+                n["transacao_id"] = "indefinido"
+            else:
+                n["transacao_id"] = str(n["transacao_id"])
+
+            if "conta_id" not in n or not isinstance(n["conta_id"], str):
+                n["conta_id"] = "desconhecido"
+
+            if "cliente_id" not in n or not isinstance(n["cliente_id"], int):
+                n["cliente_id"] = -1  # valor default
+
+            resultados.append(n)
+
+        except Exception as e:
+            print(f"⚠️ Erro ao preparar notificação: {e}")
+            continue
+
+    return resultados
 # PUT /notificacoes/{id}
 @router.put("/notificacoes/{notificacao_id}")
 async def atualizar_status_notificacao(notificacao_id: str, novo_status: StatusNotificacao = Query(...)):
