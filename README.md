@@ -37,9 +37,33 @@ Banco de Dados: MongoDB
 
  ESTRUTURA DO PROJETO:
 -
-
-
-
+.
+├── app/
+│   ├── db/                         
+│   ├── routes/                     
+│   │   ├── auth.py
+│   │   ├── contas.py
+│   │   ├── dashboard_teste.py
+│   │   ├── fraude.py
+│   │   ├── notificacoes.py
+│   │   ├── transacao.py
+│   │   └── usuario.py
+│   ├── schemas/                    
+│   │   ├── auth_schema.py
+│   │   ├── conta_schema.py
+│   │   ├── dashboard_schema.py
+│   │   ├── notificacao_schema.py
+│   │   └── transacao_schema.py
+│   ├── scripts/                    
+│   │   └── criar_hash.py
+│   ├── services/                   
+│   │   ├── dashboard_service.py
+│   │   ├── dashboard_service_teste.py
+│   │   └── ml_client.py
+│   ├── utils/                     
+│   └── main.py                     
+├── requirements.txt                
+├── .gitignore                                           
 comando inicialização uvicorn:
    uvicorn app.main:app --reload
 
