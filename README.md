@@ -4,7 +4,7 @@ SOBRE O PROJETO:
  Projeto Antifraude
   O projeto está estruturado da seguinte forma:
 
- ##OBJETIVO:
+## OBJETIVO:
  -
 Desenvolver um sistema antifraude capaz de identificar transações financeiras suspeitas e mapear comportamentos típicos de contas bancárias com base no histórico de transações, permitindo detectar possíveis anomalias em tempo real. O projeto adota uma abordagem que combina o mapeamento do comportamento padrão por conta com um módulo de inferência inteligente, responsável por identificar desvios em relação ao padrão esperado e classificar o risco de cada transação.
 
