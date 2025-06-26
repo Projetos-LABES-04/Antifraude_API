@@ -84,7 +84,7 @@ antifraude_api/
 └── start.sh 
 
 
-comando inicialização uvicorn:
+•comando inicialização uvicorn:
    uvicorn app.main:app --reload
 
  CONCLUSÃO:
