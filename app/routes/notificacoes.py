@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/notificacoes", response_model=List[NotificacaoComID])
 async def listar_notificacoes(status: Optional[str] = Query(None)):
     filtro = {"status": status} if status else {}
-    notificacoes = await notificacoes_collection.find(filtro).sort("data", -1).to_list(100)
+    notificacoes = await notificacoes_collection.find(filtro).sort("data", -1).to_list(None)
 
     resultados = []
 
